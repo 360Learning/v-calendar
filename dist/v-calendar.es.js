@@ -29,9 +29,9 @@ var __objRest = (source, exclude) => {
     }
   return target;
 };
-import { openBlock, createBlock, Transition, withCtx, renderSlot, h, reactive, computed, createElementBlock, createElementVNode, normalizeStyle, normalizeClass, createCommentVNode, createTextVNode, toDisplayString, resolveComponent, createVNode, Fragment, renderList, mergeProps, withModifiers } from "vue";
+import { openBlock, createBlock, Transition, withCtx, renderSlot, h, reactive, computed, createVNode, createCommentVNode, createTextVNode, toDisplayString, resolveComponent, Fragment, renderList, mergeProps, withModifiers } from "vue";
 import { createPopper } from "@popperjs/core";
-function toInteger(dirtyNumber) {
+function toInteger$2(dirtyNumber) {
   if (dirtyNumber === null || dirtyNumber === true || dirtyNumber === false) {
     return NaN;
   }
@@ -64,7 +64,7 @@ function toDate$1(argument) {
 function addDays(dirtyDate, dirtyAmount) {
   requiredArgs(2, arguments);
   var date = toDate$1(dirtyDate);
-  var amount = toInteger(dirtyAmount);
+  var amount = toInteger$2(dirtyAmount);
   if (isNaN(amount)) {
     return new Date(NaN);
   }
@@ -77,7 +77,7 @@ function addDays(dirtyDate, dirtyAmount) {
 function addMonths(dirtyDate, dirtyAmount) {
   requiredArgs(2, arguments);
   var date = toDate$1(dirtyDate);
-  var amount = toInteger(dirtyAmount);
+  var amount = toInteger$2(dirtyAmount);
   if (isNaN(amount)) {
     return new Date(NaN);
   }
@@ -97,10 +97,13 @@ function addMonths(dirtyDate, dirtyAmount) {
 }
 function addYears(dirtyDate, dirtyAmount) {
   requiredArgs(2, arguments);
-  var amount = toInteger(dirtyAmount);
+  var amount = toInteger$2(dirtyAmount);
   return addMonths(dirtyDate, amount * 12);
 }
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
+function getDefaultExportFromCjs(x) {
+  return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
+}
 var freeGlobal$1 = typeof commonjsGlobal == "object" && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
 var _freeGlobal = freeGlobal$1;
 var freeGlobal = _freeGlobal;
@@ -2931,18 +2934,46 @@ class Theme {
     return attr;
   }
 }
-var MILLISECONDS_IN_MINUTE$2 = 6e4;
-function getDateMillisecondsPart(date) {
-  return date.getTime() % MILLISECONDS_IN_MINUTE$2;
-}
-function getTimezoneOffsetInMilliseconds(dirtyDate) {
-  var date = new Date(dirtyDate.getTime());
-  var baseTimezoneOffset = Math.ceil(date.getTimezoneOffset());
-  date.setSeconds(0, 0);
-  var hasNegativeUTCOffset = baseTimezoneOffset > 0;
-  var millisecondsPartOfTimezoneOffset = hasNegativeUTCOffset ? (MILLISECONDS_IN_MINUTE$2 + getDateMillisecondsPart(date)) % MILLISECONDS_IN_MINUTE$2 : getDateMillisecondsPart(date);
-  return baseTimezoneOffset * MILLISECONDS_IN_MINUTE$2 + millisecondsPartOfTimezoneOffset;
-}
+var toInteger$1 = { exports: {} };
+(function(module, exports) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = toInteger2;
+  function toInteger2(dirtyNumber) {
+    if (dirtyNumber === null || dirtyNumber === true || dirtyNumber === false) {
+      return NaN;
+    }
+    var number = Number(dirtyNumber);
+    if (isNaN(number)) {
+      return number;
+    }
+    return number < 0 ? Math.ceil(number) : Math.floor(number);
+  }
+  module.exports = exports.default;
+})(toInteger$1, toInteger$1.exports);
+var toInteger = /* @__PURE__ */ getDefaultExportFromCjs(toInteger$1.exports);
+var getTimezoneOffsetInMilliseconds$2 = { exports: {} };
+(function(module, exports) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = getTimezoneOffsetInMilliseconds2;
+  var MILLISECONDS_IN_MINUTE2 = 6e4;
+  function getDateMillisecondsPart2(date) {
+    return date.getTime() % MILLISECONDS_IN_MINUTE2;
+  }
+  function getTimezoneOffsetInMilliseconds2(dirtyDate) {
+    var date = new Date(dirtyDate.getTime());
+    var baseTimezoneOffset = Math.ceil(date.getTimezoneOffset());
+    date.setSeconds(0, 0);
+    var hasNegativeUTCOffset = baseTimezoneOffset > 0;
+    var millisecondsPartOfTimezoneOffset = hasNegativeUTCOffset ? (MILLISECONDS_IN_MINUTE2 + getDateMillisecondsPart2(date)) % MILLISECONDS_IN_MINUTE2 : getDateMillisecondsPart2(date);
+    return baseTimezoneOffset * MILLISECONDS_IN_MINUTE2 + millisecondsPartOfTimezoneOffset;
+  }
+  module.exports = exports.default;
+})(getTimezoneOffsetInMilliseconds$2, getTimezoneOffsetInMilliseconds$2.exports);
+var getTimezoneOffsetInMilliseconds$1 = /* @__PURE__ */ getDefaultExportFromCjs(getTimezoneOffsetInMilliseconds$2.exports);
 function tzTokenizeDate(date, timeZone) {
   var dtf = getDateTimeFormat(timeZone);
   return dtf.formatToParts ? partsOffset(dtf, date) : hackyOffset(dtf, date);
@@ -2956,15 +2987,22 @@ var typeToPos = {
   second: 5
 };
 function partsOffset(dtf, date) {
-  var formatted = dtf.formatToParts(date);
-  var filled = [];
-  for (var i = 0; i < formatted.length; i++) {
-    var pos = typeToPos[formatted[i].type];
-    if (pos >= 0) {
-      filled[pos] = parseInt(formatted[i].value, 10);
+  try {
+    var formatted = dtf.formatToParts(date);
+    var filled = [];
+    for (var i = 0; i < formatted.length; i++) {
+      var pos = typeToPos[formatted[i].type];
+      if (pos >= 0) {
+        filled[pos] = parseInt(formatted[i].value, 10);
+      }
     }
+    return filled;
+  } catch (error) {
+    if (error instanceof RangeError) {
+      return [NaN];
+    }
+    throw error;
   }
-  return filled;
 }
 function hackyOffset(dtf, date) {
   var formatted = dtf.format(date).replace(/\u200E/g, "");
@@ -2978,7 +3016,7 @@ function getDateTimeFormat(timeZone) {
       hour12: false,
       timeZone: "America/New_York",
       year: "numeric",
-      month: "2-digit",
+      month: "numeric",
       day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
@@ -2989,7 +3027,7 @@ function getDateTimeFormat(timeZone) {
       hour12: false,
       timeZone,
       year: "numeric",
-      month: "2-digit",
+      month: "numeric",
       day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
@@ -2998,7 +3036,7 @@ function getDateTimeFormat(timeZone) {
       hourCycle: "h23",
       timeZone,
       year: "numeric",
-      month: "2-digit",
+      month: "numeric",
       day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
@@ -3007,18 +3045,26 @@ function getDateTimeFormat(timeZone) {
   }
   return dtfCache[timeZone];
 }
+function newDateUTC(fullYear, month, day, hour, minute, second, millisecond) {
+  var utcDate = new Date(0);
+  utcDate.setUTCFullYear(fullYear, month, day);
+  utcDate.setUTCHours(hour, minute, second, millisecond);
+  return utcDate;
+}
 var MILLISECONDS_IN_HOUR$1 = 36e5;
-var MILLISECONDS_IN_MINUTE$1 = 6e4;
+var MILLISECONDS_IN_MINUTE$2 = 6e4;
 var patterns$1 = {
   timezone: /([Z+-].*)$/,
   timezoneZ: /^(Z)$/,
-  timezoneHH: /^([+-])(\d{2})$/,
-  timezoneHHMM: /^([+-])(\d{2}):?(\d{2})$/,
-  timezoneIANA: /(UTC|(?:[a-zA-Z]+\/[a-zA-Z_]+(?:\/[a-zA-Z_]+)?))$/
+  timezoneHH: /^([+-]\d{2})$/,
+  timezoneHHMM: /^([+-]\d{2}):?(\d{2})$/
 };
-function tzParseTimezone(timezoneString, date) {
+function tzParseTimezone(timezoneString, date, isUtcDate) {
   var token2;
   var absoluteOffset;
+  if (!timezoneString) {
+    return 0;
+  }
   token2 = patterns$1.timezoneZ.exec(timezoneString);
   if (token2) {
     return 0;
@@ -3026,45 +3072,80 @@ function tzParseTimezone(timezoneString, date) {
   var hours;
   token2 = patterns$1.timezoneHH.exec(timezoneString);
   if (token2) {
-    hours = parseInt(token2[2], 10);
-    if (!validateTimezone()) {
+    hours = parseInt(token2[1], 10);
+    if (!validateTimezone(hours)) {
       return NaN;
     }
-    absoluteOffset = hours * MILLISECONDS_IN_HOUR$1;
-    return token2[1] === "+" ? -absoluteOffset : absoluteOffset;
+    return -(hours * MILLISECONDS_IN_HOUR$1);
   }
   token2 = patterns$1.timezoneHHMM.exec(timezoneString);
   if (token2) {
-    hours = parseInt(token2[2], 10);
-    var minutes = parseInt(token2[3], 10);
+    hours = parseInt(token2[1], 10);
+    var minutes = parseInt(token2[2], 10);
     if (!validateTimezone(hours, minutes)) {
       return NaN;
     }
-    absoluteOffset = hours * MILLISECONDS_IN_HOUR$1 + minutes * MILLISECONDS_IN_MINUTE$1;
-    return token2[1] === "+" ? -absoluteOffset : absoluteOffset;
+    absoluteOffset = Math.abs(hours) * MILLISECONDS_IN_HOUR$1 + minutes * MILLISECONDS_IN_MINUTE$2;
+    return hours > 0 ? -absoluteOffset : absoluteOffset;
   }
-  token2 = patterns$1.timezoneIANA.exec(timezoneString);
-  if (token2) {
-    var tokens = tzTokenizeDate(date, timezoneString);
-    var asUTC = Date.UTC(tokens[0], tokens[1] - 1, tokens[2], tokens[3], tokens[4], tokens[5]);
-    var timestampWithMsZeroed = date.getTime() - date.getTime() % 1e3;
-    return -(asUTC - timestampWithMsZeroed);
+  if (isValidTimezoneIANAString(timezoneString)) {
+    date = new Date(date || Date.now());
+    var utcDate = isUtcDate ? date : toUtcDate(date);
+    var offset = calcOffset(utcDate, timezoneString);
+    var fixedOffset = isUtcDate ? offset : fixOffset(date, offset, timezoneString);
+    return -fixedOffset;
   }
-  return 0;
+  return NaN;
+}
+function toUtcDate(date) {
+  return newDateUTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
+}
+function calcOffset(date, timezoneString) {
+  var tokens = tzTokenizeDate(date, timezoneString);
+  var asUTC = newDateUTC(tokens[0], tokens[1] - 1, tokens[2], tokens[3] % 24, tokens[4], tokens[5], 0).getTime();
+  var asTS = date.getTime();
+  var over = asTS % 1e3;
+  asTS -= over >= 0 ? over : 1e3 + over;
+  return asUTC - asTS;
+}
+function fixOffset(date, offset, timezoneString) {
+  var localTS = date.getTime();
+  var utcGuess = localTS - offset;
+  var o2 = calcOffset(new Date(utcGuess), timezoneString);
+  if (offset === o2) {
+    return offset;
+  }
+  utcGuess -= o2 - offset;
+  var o3 = calcOffset(new Date(utcGuess), timezoneString);
+  if (o2 === o3) {
+    return o2;
+  }
+  return Math.max(o2, o3);
 }
 function validateTimezone(hours, minutes) {
-  if (minutes != null && (minutes < 0 || minutes > 59)) {
+  return -23 <= hours && hours <= 23 && (minutes == null || 0 <= minutes && minutes <= 59);
+}
+var validIANATimezoneCache = {};
+function isValidTimezoneIANAString(timeZoneString) {
+  if (validIANATimezoneCache[timeZoneString])
+    return true;
+  try {
+    new Intl.DateTimeFormat(void 0, { timeZone: timeZoneString });
+    validIANATimezoneCache[timeZoneString] = true;
+    return true;
+  } catch (error) {
     return false;
   }
-  return true;
 }
+var tzPattern = /(Z|[+-]\d{2}(?::?\d{2})?| UTC| [a-zA-Z]+\/[a-zA-Z_]+(?:\/[a-zA-Z_]+)?)$/;
+var tzPattern$1 = tzPattern;
 var MILLISECONDS_IN_HOUR = 36e5;
-var MILLISECONDS_IN_MINUTE = 6e4;
+var MILLISECONDS_IN_MINUTE$1 = 6e4;
 var DEFAULT_ADDITIONAL_DIGITS = 2;
 var patterns = {
-  dateTimeDelimeter: /[T ]/,
+  dateTimePattern: /^([0-9W+-]+)(T| )(.*)/,
+  datePattern: /^([0-9W+-]+)(.*)/,
   plainTime: /:/,
-  timeZoneDelimeter: /[Z ]/i,
   YY: /^(\d{2})$/,
   YYY: [
     /^([+-]\d{2})$/,
@@ -3085,7 +3166,7 @@ var patterns = {
   HH: /^(\d{2}([.,]\d*)?)$/,
   HHMM: /^(\d{2}):?(\d{2}([.,]\d*)?)$/,
   HHMMSS: /^(\d{2}):?(\d{2}):?(\d{2}([.,]\d*)?)$/,
-  timezone: /([Z+-].*| UTC|(?:[a-zA-Z]+\/[a-zA-Z_]+(?:\/[a-zA-Z_]+)?))$/
+  timeZone: tzPattern$1
 };
 function toDate(argument, dirtyOptions) {
   if (arguments.length < 1) {
@@ -3124,18 +3205,14 @@ function toDate(argument, dirtyOptions) {
         return new Date(NaN);
       }
     }
-    if (dateStrings.timezone || options.timeZone) {
-      offset = tzParseTimezone(dateStrings.timezone || options.timeZone, new Date(timestamp + time));
-      if (isNaN(offset)) {
-        return new Date(NaN);
-      }
-      offset = tzParseTimezone(dateStrings.timezone || options.timeZone, new Date(timestamp + time + offset));
+    if (dateStrings.timeZone || options.timeZone) {
+      offset = tzParseTimezone(dateStrings.timeZone || options.timeZone, new Date(timestamp + time));
       if (isNaN(offset)) {
         return new Date(NaN);
       }
     } else {
-      offset = getTimezoneOffsetInMilliseconds(new Date(timestamp + time));
-      offset = getTimezoneOffsetInMilliseconds(new Date(timestamp + time + offset));
+      offset = getTimezoneOffsetInMilliseconds$1(new Date(timestamp + time));
+      offset = getTimezoneOffsetInMilliseconds$1(new Date(timestamp + time + offset));
     }
     return new Date(timestamp + time + offset);
   } else {
@@ -3144,25 +3221,26 @@ function toDate(argument, dirtyOptions) {
 }
 function splitDateString(dateString) {
   var dateStrings = {};
-  var array = dateString.split(patterns.dateTimeDelimeter);
+  var parts = patterns.dateTimePattern.exec(dateString);
   var timeString;
-  if (patterns.plainTime.test(array[0])) {
-    dateStrings.date = null;
-    timeString = array[0];
-  } else {
-    dateStrings.date = array[0];
-    timeString = array[1];
-    dateStrings.timezone = array[2];
-    if (patterns.timeZoneDelimeter.test(dateStrings.date)) {
-      dateStrings.date = dateString.split(patterns.timeZoneDelimeter)[0];
-      timeString = dateString.substr(dateStrings.date.length, dateString.length);
+  if (!parts) {
+    parts = patterns.datePattern.exec(dateString);
+    if (parts) {
+      dateStrings.date = parts[1];
+      timeString = parts[2];
+    } else {
+      dateStrings.date = null;
+      timeString = dateString;
     }
+  } else {
+    dateStrings.date = parts[1];
+    timeString = parts[3];
   }
   if (timeString) {
-    var token2 = patterns.timezone.exec(timeString);
+    var token2 = patterns.timeZone.exec(timeString);
     if (token2) {
       dateStrings.time = timeString.replace(token2[1], "");
-      dateStrings.timezone = token2[1];
+      dateStrings.timeZone = token2[1].trim();
     } else {
       dateStrings.time = timeString;
     }
@@ -3275,7 +3353,7 @@ function parseTime(timeString) {
     if (!validateTime(hours, minutes)) {
       return NaN;
     }
-    return hours % 24 * MILLISECONDS_IN_HOUR + minutes * MILLISECONDS_IN_MINUTE;
+    return hours % 24 * MILLISECONDS_IN_HOUR + minutes * MILLISECONDS_IN_MINUTE$1;
   }
   token2 = patterns.HHMMSS.exec(timeString);
   if (token2) {
@@ -3285,7 +3363,7 @@ function parseTime(timeString) {
     if (!validateTime(hours, minutes, seconds)) {
       return NaN;
     }
-    return hours % 24 * MILLISECONDS_IN_HOUR + minutes * MILLISECONDS_IN_MINUTE + seconds * 1e3;
+    return hours % 24 * MILLISECONDS_IN_HOUR + minutes * MILLISECONDS_IN_MINUTE$1 + seconds * 1e3;
   }
   return null;
 }
@@ -3361,8 +3439,8 @@ function startOfWeek(dirtyDate, dirtyOptions) {
   var options = dirtyOptions || {};
   var locale = options.locale;
   var localeWeekStartsOn = locale && locale.options && locale.options.weekStartsOn;
-  var defaultWeekStartsOn = localeWeekStartsOn == null ? 0 : toInteger(localeWeekStartsOn);
-  var weekStartsOn = options.weekStartsOn == null ? defaultWeekStartsOn : toInteger(options.weekStartsOn);
+  var defaultWeekStartsOn = localeWeekStartsOn == null ? 0 : toInteger$2(localeWeekStartsOn);
+  var weekStartsOn = options.weekStartsOn == null ? defaultWeekStartsOn : toInteger$2(options.weekStartsOn);
   if (!(weekStartsOn >= 0 && weekStartsOn <= 6)) {
     throw new RangeError("weekStartsOn must be between 0 and 6 inclusively");
   }
@@ -3422,8 +3500,8 @@ function getWeekYear(dirtyDate, dirtyOptions) {
   var options = dirtyOptions || {};
   var locale = options.locale;
   var localeFirstWeekContainsDate = locale && locale.options && locale.options.firstWeekContainsDate;
-  var defaultFirstWeekContainsDate = localeFirstWeekContainsDate == null ? 1 : toInteger(localeFirstWeekContainsDate);
-  var firstWeekContainsDate = options.firstWeekContainsDate == null ? defaultFirstWeekContainsDate : toInteger(options.firstWeekContainsDate);
+  var defaultFirstWeekContainsDate = localeFirstWeekContainsDate == null ? 1 : toInteger$2(localeFirstWeekContainsDate);
+  var firstWeekContainsDate = options.firstWeekContainsDate == null ? defaultFirstWeekContainsDate : toInteger$2(options.firstWeekContainsDate);
   if (!(firstWeekContainsDate >= 1 && firstWeekContainsDate <= 7)) {
     throw new RangeError("firstWeekContainsDate must be between 1 and 7 inclusively");
   }
@@ -3448,8 +3526,8 @@ function startOfWeekYear(dirtyDate, dirtyOptions) {
   var options = dirtyOptions || {};
   var locale = options.locale;
   var localeFirstWeekContainsDate = locale && locale.options && locale.options.firstWeekContainsDate;
-  var defaultFirstWeekContainsDate = localeFirstWeekContainsDate == null ? 1 : toInteger(localeFirstWeekContainsDate);
-  var firstWeekContainsDate = options.firstWeekContainsDate == null ? defaultFirstWeekContainsDate : toInteger(options.firstWeekContainsDate);
+  var defaultFirstWeekContainsDate = localeFirstWeekContainsDate == null ? 1 : toInteger$2(localeFirstWeekContainsDate);
+  var firstWeekContainsDate = options.firstWeekContainsDate == null ? defaultFirstWeekContainsDate : toInteger$2(options.firstWeekContainsDate);
   var year = getWeekYear(dirtyDate, dirtyOptions);
   var firstWeek = new Date(0);
   firstWeek.setFullYear(year, 0, firstWeekContainsDate);
@@ -3463,6 +3541,18 @@ function getWeek(dirtyDate, options) {
   var date = toDate$1(dirtyDate);
   var diff = startOfWeek(date, options).getTime() - startOfWeekYear(date, options).getTime();
   return Math.round(diff / MILLISECONDS_IN_WEEK$1) + 1;
+}
+var MILLISECONDS_IN_MINUTE = 6e4;
+function getDateMillisecondsPart(date) {
+  return date.getTime() % MILLISECONDS_IN_MINUTE;
+}
+function getTimezoneOffsetInMilliseconds(dirtyDate) {
+  var date = new Date(dirtyDate.getTime());
+  var baseTimezoneOffset = Math.ceil(date.getTimezoneOffset());
+  date.setSeconds(0, 0);
+  var hasNegativeUTCOffset = baseTimezoneOffset > 0;
+  var millisecondsPartOfTimezoneOffset = hasNegativeUTCOffset ? (MILLISECONDS_IN_MINUTE + getDateMillisecondsPart(date)) % MILLISECONDS_IN_MINUTE : getDateMillisecondsPart(date);
+  return baseTimezoneOffset * MILLISECONDS_IN_MINUTE + millisecondsPartOfTimezoneOffset;
 }
 var MILLISECONDS_IN_WEEK = 6048e5;
 function differenceInCalendarWeeks(dirtyDateLeft, dirtyDateRight, dirtyOptions) {
@@ -5032,21 +5122,21 @@ const _sfc_main$8 = {
     }
   }
 };
-const _hoisted_1$4 = { class: "vc-day-popover-row" };
-const _hoisted_2$4 = {
+const _hoisted_1$3 = { class: "vc-day-popover-row" };
+const _hoisted_2$3 = {
   key: 0,
   class: "vc-day-popover-row-indicator"
 };
-const _hoisted_3$3 = { class: "vc-day-popover-row-content" };
+const _hoisted_3$2 = { class: "vc-day-popover-row-content" };
 function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
-  return openBlock(), createElementBlock("div", _hoisted_1$4, [
-    $options.indicator ? (openBlock(), createElementBlock("div", _hoisted_2$4, [
-      createElementVNode("span", {
-        style: normalizeStyle($options.indicator.style),
-        class: normalizeClass($options.indicator.class)
+  return openBlock(), createBlock("div", _hoisted_1$3, [
+    $options.indicator ? (openBlock(), createBlock("div", _hoisted_2$3, [
+      createVNode("span", {
+        style: $options.indicator.style,
+        class: $options.indicator.class
       }, null, 6)
     ])) : createCommentVNode("", true),
-    createElementVNode("div", _hoisted_3$3, [
+    createVNode("div", _hoisted_3$2, [
       renderSlot(_ctx.$slots, "default", {}, () => [
         createTextVNode(toDisplayString($props.attribute.popover ? $props.attribute.popover.label : "No content provided"), 1)
       ])
@@ -5097,17 +5187,15 @@ const _sfc_main$7 = {
     }
   }
 };
-const _hoisted_1$3 = ["width", "height", "viewBox"];
-const _hoisted_2$3 = ["d"];
 function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
-  return openBlock(), createElementBlock("svg", {
+  return openBlock(), createBlock("svg", {
     class: "vc-svg-icon",
     width: $data.width,
     height: $data.height,
     viewBox: $data.viewBox
   }, [
-    createElementVNode("path", { d: $data.path }, null, 8, _hoisted_2$3)
-  ], 8, _hoisted_1$3);
+    createVNode("path", { d: $data.path }, null, 8, ["d"])
+  ], 8, ["width", "height", "viewBox"]);
 }
 var SvgIcon = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$3]]);
 const _yearGroupCount = 12;
@@ -5305,20 +5393,17 @@ const _hoisted_1$2 = {
   ref: "navContainer"
 };
 const _hoisted_2$2 = { class: "vc-nav-header" };
-const _hoisted_3$2 = ["tabindex"];
-const _hoisted_4$2 = ["tabindex"];
-const _hoisted_5$1 = { class: "vc-nav-items" };
-const _hoisted_6$1 = ["data-id", "aria-label", "tabindex", "onClick", "onKeydown"];
+const _hoisted_3$1 = { class: "vc-nav-items" };
 function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_svg_icon = resolveComponent("svg-icon");
-  return openBlock(), createElementBlock("div", _hoisted_1$2, [
-    createElementVNode("div", _hoisted_2$2, [
-      createElementVNode("span", {
+  return openBlock(), createBlock("div", _hoisted_1$2, [
+    createVNode("div", _hoisted_2$2, [
+      createVNode("span", {
         role: "button",
-        class: normalizeClass(["vc-nav-arrow is-left", { "is-disabled": !$options.prevItemsEnabled }]),
+        class: ["vc-nav-arrow is-left", { "is-disabled": !$options.prevItemsEnabled }],
         tabindex: $options.prevItemsEnabled ? 0 : void 0,
-        onClick: _cache[0] || (_cache[0] = (...args) => $options.movePrev && $options.movePrev(...args)),
-        onKeydown: _cache[1] || (_cache[1] = (e) => $data.onSpaceOrEnter(e, $options.movePrev))
+        onClick: _cache[1] || (_cache[1] = (...args) => $options.movePrev && $options.movePrev(...args)),
+        onKeydown: _cache[2] || (_cache[2] = (e) => $data.onSpaceOrEnter(e, $options.movePrev))
       }, [
         renderSlot(_ctx.$slots, "nav-left-button", {}, () => [
           createVNode(_component_svg_icon, {
@@ -5327,21 +5412,21 @@ function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
             height: "24px"
           })
         ])
-      ], 42, _hoisted_3$2),
-      createElementVNode("span", {
+      ], 42, ["tabindex"]),
+      createVNode("span", {
         role: "button",
         class: "vc-nav-title vc-grid-focus",
         style: { whiteSpace: "nowrap" },
         tabindex: "0",
-        onClick: _cache[2] || (_cache[2] = (...args) => $options.toggleMode && $options.toggleMode(...args)),
-        onKeydown: _cache[3] || (_cache[3] = (e) => $data.onSpaceOrEnter(e, $options.toggleMode))
+        onClick: _cache[3] || (_cache[3] = (...args) => $options.toggleMode && $options.toggleMode(...args)),
+        onKeydown: _cache[4] || (_cache[4] = (e) => $data.onSpaceOrEnter(e, $options.toggleMode))
       }, toDisplayString($options.title), 33),
-      createElementVNode("span", {
+      createVNode("span", {
         role: "button",
-        class: normalizeClass(["vc-nav-arrow is-right", { "is-disabled": !$options.nextItemsEnabled }]),
+        class: ["vc-nav-arrow is-right", { "is-disabled": !$options.nextItemsEnabled }],
         tabindex: $options.nextItemsEnabled ? 0 : void 0,
-        onClick: _cache[4] || (_cache[4] = (...args) => $options.moveNext && $options.moveNext(...args)),
-        onKeydown: _cache[5] || (_cache[5] = (e) => $data.onSpaceOrEnter(e, $options.moveNext))
+        onClick: _cache[5] || (_cache[5] = (...args) => $options.moveNext && $options.moveNext(...args)),
+        onKeydown: _cache[6] || (_cache[6] = (e) => $data.onSpaceOrEnter(e, $options.moveNext))
       }, [
         renderSlot(_ctx.$slots, "nav-right-button", {}, () => [
           createVNode(_component_svg_icon, {
@@ -5350,20 +5435,20 @@ function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
             height: "24px"
           })
         ])
-      ], 42, _hoisted_4$2)
+      ], 42, ["tabindex"])
     ]),
-    createElementVNode("div", _hoisted_5$1, [
-      (openBlock(true), createElementBlock(Fragment, null, renderList($options.activeItems, (item) => {
-        return openBlock(), createElementBlock("span", {
+    createVNode("div", _hoisted_3$1, [
+      (openBlock(true), createBlock(Fragment, null, renderList($options.activeItems, (item) => {
+        return openBlock(), createBlock("span", {
           key: item.label,
           role: "button",
           "data-id": item.id,
           "aria-label": item.ariaLabel,
-          class: normalizeClass($options.getItemClasses(item)),
+          class: $options.getItemClasses(item),
           tabindex: item.isDisabled ? void 0 : 0,
           onClick: item.click,
           onKeydown: (e) => $data.onSpaceOrEnter(e, item.click)
-        }, toDisplayString(item.label), 43, _hoisted_6$1);
+        }, toDisplayString(item.label), 43, ["data-id", "aria-label", "tabindex", "onClick", "onKeydown"]);
       }), 128))
     ])
   ], 512);
@@ -6680,31 +6765,29 @@ const _sfc_main$2 = {
   }
 };
 const _hoisted_1$1 = { class: "vc-select" };
-const _hoisted_2$1 = ["value"];
-const _hoisted_3$1 = ["value", "disabled"];
-const _hoisted_4$1 = /* @__PURE__ */ createElementVNode("div", { class: "vc-select-arrow" }, [
-  /* @__PURE__ */ createElementVNode("svg", {
+const _hoisted_2$1 = /* @__PURE__ */ createVNode("div", { class: "vc-select-arrow" }, [
+  /* @__PURE__ */ createVNode("svg", {
     xmlns: "http://www.w3.org/2000/svg",
     viewBox: "0 0 20 20"
   }, [
-    /* @__PURE__ */ createElementVNode("path", { d: "M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" })
+    /* @__PURE__ */ createVNode("path", { d: "M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" })
   ])
 ], -1);
 function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
-  return openBlock(), createElementBlock("div", _hoisted_1$1, [
-    createElementVNode("select", mergeProps(_ctx.$attrs, {
+  return openBlock(), createBlock("div", _hoisted_1$1, [
+    createVNode("select", mergeProps(_ctx.$attrs, {
       value: $props.modelValue,
-      onChange: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("update:modelValue", $event.target.value))
+      onChange: _cache[1] || (_cache[1] = ($event) => _ctx.$emit("update:modelValue", $event.target.value))
     }), [
-      (openBlock(true), createElementBlock(Fragment, null, renderList($props.options, (option) => {
-        return openBlock(), createElementBlock("option", {
+      (openBlock(true), createBlock(Fragment, null, renderList($props.options, (option) => {
+        return openBlock(), createBlock("option", {
           key: option.value,
           value: option.value,
           disabled: option.disabled
-        }, toDisplayString(option.label), 9, _hoisted_3$1);
+        }, toDisplayString(option.label), 9, ["value", "disabled"]);
       }), 128))
-    ], 16, _hoisted_2$1),
-    _hoisted_4$1
+    ], 16, ["value"]),
+    _hoisted_2$1
   ]);
 }
 var TimeSelect = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1]]);
@@ -6820,8 +6903,8 @@ const _sfc_main$1 = {
     }
   }
 };
-const _hoisted_1 = /* @__PURE__ */ createElementVNode("div", null, [
-  /* @__PURE__ */ createElementVNode("svg", {
+const _hoisted_1 = /* @__PURE__ */ createVNode("div", null, [
+  /* @__PURE__ */ createVNode("svg", {
     fill: "none",
     "stroke-linecap": "round",
     "stroke-linejoin": "round",
@@ -6830,7 +6913,7 @@ const _hoisted_1 = /* @__PURE__ */ createElementVNode("div", null, [
     class: "vc-time-icon",
     stroke: "currentColor"
   }, [
-    /* @__PURE__ */ createElementVNode("path", { d: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" })
+    /* @__PURE__ */ createVNode("path", { d: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" })
   ])
 ], -1);
 const _hoisted_2 = { class: "vc-time-content" };
@@ -6843,47 +6926,47 @@ const _hoisted_5 = { class: "vc-time-month" };
 const _hoisted_6 = { class: "vc-time-day" };
 const _hoisted_7 = { class: "vc-time-year" };
 const _hoisted_8 = { class: "vc-time-select" };
-const _hoisted_9 = /* @__PURE__ */ createElementVNode("span", { style: { "margin": "0 4px" } }, ":", -1);
+const _hoisted_9 = /* @__PURE__ */ createVNode("span", { style: { "margin": "0 4px" } }, ":", -1);
 const _hoisted_10 = {
   key: 0,
   class: "vc-am-pm"
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_time_select = resolveComponent("time-select");
-  return openBlock(), createElementBlock("div", {
-    class: normalizeClass(["vc-time-picker", [{ "vc-invalid": !$props.modelValue.isValid, "vc-bordered": $props.showBorder }]])
+  return openBlock(), createBlock("div", {
+    class: ["vc-time-picker", [{ "vc-invalid": !$props.modelValue.isValid, "vc-bordered": $props.showBorder }]]
   }, [
     _hoisted_1,
-    createElementVNode("div", _hoisted_2, [
-      $options.date ? (openBlock(), createElementBlock("div", _hoisted_3, [
-        createElementVNode("span", _hoisted_4, toDisplayString($props.locale.format($options.date, "WWW")), 1),
-        createElementVNode("span", _hoisted_5, toDisplayString($props.locale.format($options.date, "MMM")), 1),
-        createElementVNode("span", _hoisted_6, toDisplayString($props.locale.format($options.date, "D")), 1),
-        createElementVNode("span", _hoisted_7, toDisplayString($props.locale.format($options.date, "YYYY")), 1)
+    createVNode("div", _hoisted_2, [
+      $options.date ? (openBlock(), createBlock("div", _hoisted_3, [
+        createVNode("span", _hoisted_4, toDisplayString($props.locale.format($options.date, "WWW")), 1),
+        createVNode("span", _hoisted_5, toDisplayString($props.locale.format($options.date, "MMM")), 1),
+        createVNode("span", _hoisted_6, toDisplayString($props.locale.format($options.date, "D")), 1),
+        createVNode("span", _hoisted_7, toDisplayString($props.locale.format($options.date, "YYYY")), 1)
       ])) : createCommentVNode("", true),
-      createElementVNode("div", _hoisted_8, [
+      createVNode("div", _hoisted_8, [
         createVNode(_component_time_select, {
           modelValue: $options.hours,
-          "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $options.hours = $event),
+          "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $options.hours = $event),
           modelModifiers: { number: true },
           options: $options.hourOptions_
         }, null, 8, ["modelValue", "options"]),
         _hoisted_9,
         createVNode(_component_time_select, {
           modelValue: $options.minutes,
-          "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $options.minutes = $event),
+          "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $options.minutes = $event),
           modelModifiers: { number: true },
           options: $props.minuteOptions
         }, null, 8, ["modelValue", "options"]),
-        !$props.is24hr ? (openBlock(), createElementBlock("div", _hoisted_10, [
-          createElementVNode("button", {
-            class: normalizeClass({ active: $options.isAM, "vc-disabled": $options.amDisabled }),
-            onClick: _cache[2] || (_cache[2] = withModifiers(($event) => $options.isAM = true, ["prevent"])),
+        !$props.is24hr ? (openBlock(), createBlock("div", _hoisted_10, [
+          createVNode("button", {
+            class: { active: $options.isAM, "vc-disabled": $options.amDisabled },
+            onClick: _cache[3] || (_cache[3] = withModifiers(($event) => $options.isAM = true, ["prevent"])),
             type: "button"
           }, " AM ", 2),
-          createElementVNode("button", {
-            class: normalizeClass({ active: !$options.isAM, "vc-disabled": $options.pmDisabled }),
-            onClick: _cache[3] || (_cache[3] = withModifiers(($event) => $options.isAM = false, ["prevent"])),
+          createVNode("button", {
+            class: { active: !$options.isAM, "vc-disabled": $options.pmDisabled },
+            onClick: _cache[4] || (_cache[4] = withModifiers(($event) => $options.isAM = false, ["prevent"])),
             type: "button"
           }, " PM ", 2)
         ])) : createCommentVNode("", true)
