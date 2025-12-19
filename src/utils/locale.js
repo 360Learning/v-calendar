@@ -361,85 +361,82 @@ export default class Locale {
 
   parse(dateString, mask) {
     const masks = this.normalizeMasks(mask);
-    return (
-      masks
-        .map(m => {
-          if (typeof m !== 'string') {
-            throw new Error('Invalid mask in fecha.parse');
-          }
-          // Reset string value
-          let str = dateString;
-          // Avoid regular expression denial of service, fail early for really long strings
-          // https://www.owasp.org/index.php/Regular_expression_Denial_of_Service_-_ReDoS
-          if (str.length > 1000) {
-            return false;
-          }
+    return masks
+      .map(m => {
+        if (typeof m !== 'string') {
+          throw new Error('Invalid mask in fecha.parse');
+        }
+        // Reset string value
+        let str = dateString;
+        // Avoid regular expression denial of service, fail early for really long strings
+        // https://www.owasp.org/index.php/Regular_expression_Denial_of_Service_-_ReDoS
+        if (str.length > 1000) {
+          return false;
+        }
 
-          let isValid = true;
-          const dateInfo = {};
-          m.replace(token, $0 => {
-            if (parseFlags[$0]) {
-              const info = parseFlags[$0];
-              const index = str.search(info[0]);
-              if (!~index) {
-                isValid = false;
-              } else {
-                str.replace(info[0], result => {
-                  info[1](dateInfo, result, this);
-                  str = str.substring(index + result.length);
-                  return result;
-                });
-              }
+        let isValid = true;
+        const dateInfo = {};
+        m.replace(token, $0 => {
+          if (parseFlags[$0]) {
+            const info = parseFlags[$0];
+            const index = str.search(info[0]);
+            if (!~index) {
+              isValid = false;
+            } else {
+              str.replace(info[0], result => {
+                info[1](dateInfo, result, this);
+                str = str.substring(index + result.length);
+                return result;
+              });
             }
+          }
 
-            return parseFlags[$0] ? '' : $0.slice(1, $0.length - 1);
+          return parseFlags[$0] ? '' : $0.slice(1, $0.length - 1);
+        });
+
+        if (!isValid) {
+          return false;
+        }
+
+        const today = new Date();
+        if (
+          dateInfo.isPm === true &&
+          dateInfo.hour != null &&
+          +dateInfo.hour !== 12
+        ) {
+          dateInfo.hour = +dateInfo.hour + 12;
+        } else if (dateInfo.isPm === false && +dateInfo.hour === 12) {
+          dateInfo.hour = 0;
+        }
+
+        let date;
+        if (dateInfo.timezoneOffset != null) {
+          dateInfo.minute = +(dateInfo.minute || 0) - +dateInfo.timezoneOffset;
+          date = new Date(
+            Date.UTC(
+              dateInfo.year || today.getFullYear(),
+              dateInfo.month || 0,
+              dateInfo.day || 1,
+              dateInfo.hour || 0,
+              dateInfo.minute || 0,
+              dateInfo.second || 0,
+              dateInfo.millisecond || 0,
+            ),
+          );
+        } else {
+          date = this.getDateFromParts({
+            year: dateInfo.year || today.getFullYear(),
+            month: (dateInfo.month || 0) + 1,
+            day: dateInfo.day || 1,
+            hours: dateInfo.hour || 0,
+            minutes: dateInfo.minute || 0,
+            seconds: dateInfo.second || 0,
+            milliseconds: dateInfo.millisecond || 0,
           });
-
-          if (!isValid) {
-            return false;
-          }
-
-          const today = new Date();
-          if (
-            dateInfo.isPm === true &&
-            dateInfo.hour != null &&
-            +dateInfo.hour !== 12
-          ) {
-            dateInfo.hour = +dateInfo.hour + 12;
-          } else if (dateInfo.isPm === false && +dateInfo.hour === 12) {
-            dateInfo.hour = 0;
-          }
-
-          let date;
-          if (dateInfo.timezoneOffset != null) {
-            dateInfo.minute =
-              +(dateInfo.minute || 0) - +dateInfo.timezoneOffset;
-            date = new Date(
-              Date.UTC(
-                dateInfo.year || today.getFullYear(),
-                dateInfo.month || 0,
-                dateInfo.day || 1,
-                dateInfo.hour || 0,
-                dateInfo.minute || 0,
-                dateInfo.second || 0,
-                dateInfo.millisecond || 0,
-              ),
-            );
-          } else {
-            date = this.getDateFromParts({
-              year: dateInfo.year || today.getFullYear(),
-              month: (dateInfo.month || 0) + 1,
-              day: dateInfo.day || 1,
-              hours: dateInfo.hour || 0,
-              minutes: dateInfo.minute || 0,
-              seconds: dateInfo.second || 0,
-              milliseconds: dateInfo.millisecond || 0,
-            });
-          }
-          return date;
-        })
-        .find(d => d) || new Date(dateString)
-    );
+        }
+        return date;
+      })
+      .find(d => d);
   }
 
   // Normalizes mask(s) as an array with replaced mask macros
