@@ -4331,7 +4331,7 @@ class Locale {
         });
       }
       return date;
-    }).find((d) => d) || new Date(dateString);
+    }).find((d) => d);
   }
   normalizeMasks(masks2) {
     return (arrayHasItems(masks2) && masks2 || [
