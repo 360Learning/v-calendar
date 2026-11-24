@@ -1,6 +1,6 @@
 {
   "name": "@360Learning/v-calendar",
-  "version": "3.0.0-alpha.8.3",
+  "version": "3.0.0-alpha.8.5",
   "description": "A clean and extendable plugin for building simple attributed calendars in Vue.js.",
   "author": "360Learning <dev@360learning.com>",
   "repository": {
